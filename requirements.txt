@@ -1,0 +1,11 @@
+fastapi~=0.66.0
+uvicorn~=0.14.0
+pydantic~=1.8.2
+starlette~=0.14.2
+
+motor~=2.2.0
+pymongo~=3.11.4
+Jinja2~=3.0.1
+crypto~=1.4.1
+PyJWT~=2.1.0
+pycrypto

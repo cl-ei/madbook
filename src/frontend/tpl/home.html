@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <title>疯人账单</title>
+    <meta name="author" content="i#caoliang.net" />
+    <meta name="referrer" content="same-origin">
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="/madbook/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/madbook/static/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/madbook/static/animate.min.css">
+    <link rel="stylesheet" href="/madbook/static/calendar/calendar.css">
+    <link rel="stylesheet" href="/madbook/static/madbook.css">
+</head>
+<body>
+<div id="body-container">
+    <div id="app-content">
+        <div id="login">
+            <div class="app-logo">
+                <div class="login-head">
+                    <div class="login-logo-wrapper"><i class="fab fa-pied-piper-alt"></i></div>
+                </div>
+                <div class="login-logo-title">
+                    <span class="login-title-text">疯人账本</span>
+                </div>
+            </div>
+            <div class="login-input-group">
+                <label>
+                    <span class="input-label-text"><i class="fas fa-signature"></i></span>
+                    <input type="text" class="input-custom" name="username" placeholder="请输入昵称">
+                </label>
+                <label>
+                    <span class="input-label-text"><i class="fas fa-unlock-alt"></i></span>
+                    <input type="password" class="input-custom" name="password" placeholder="请输入密码">
+                </label>
+                <span class="reg-input-group">
+                    <label>
+                        <span class="input-label-text"><i class="fas fa-unlock-alt"></i></span>
+                        <input type="password" class="input-custom" name="password2" placeholder="请再次输入密码">
+                    </label>
+                    <label>
+                        <span class="input-label-text"><i class="fab fa-slideshare"></i></span>
+                        <input type="text" class="input-custom" name="reg_code" placeholder="请输入邀请码">
+                    </label>
+                </span>
+                <button class="button center" id="login-submit">确定</button>
+                <div class="reg-display-banner"><a id="reg-login-switch">注册账号</a> | madbook copyright </div>
+            </div>
+        </div>
+        <div id="authed-page">
+            <div id="app-card-home" class="app-card">
+                <div class="card-0-head">
+                    <div class="book-sel">
+                        <i class="fa fa-book" aria-hidden="true"></i>
+                        <span class="book-sel-name"></span>
+                    </div>
+                    <div class="expenditure">
+                        <div class="expenditure-prompt">本月支出</div>
+                        <div class="expenditure-amount">
+                            <span>￥</span>
+                            <span class="expenditure-text">0.00</span>
+                            <span class="expenditure-show-btn"></span>
+                        </div>
+                    </div>
+                    <div class="income"><span class="income-prompt">本月收入</span><span class="income-amount">0.00</span></div>
+                </div>
+                <div class="main-btn">
+                    <div class="create-bill"><i class="fa fa-pencil-alt fa-fw"></i> 记一笔</div>
+                    <div class="create-income"><i class="fas fa-heartbeat"></i> 一言</div>
+                </div>
+                <div class="home-bills">
+                    <div class="hb-title">近三日新增账单<span class="hb-count">0</span>笔</div>
+                    <div class="hb-list"></div>
+                </div>
+            </div>
+            <div id="app-card-bill" class="app-card">
+                <div class="range-switch">
+                    <div class="datetime-range" data-index="0">月账单</div>
+                    <div class="datetime-range" data-index="1">年账单</div>
+                    <div class="datetime-range" data-index="2">自定义</div>
+                </div>
+                <div class="range-display">
+                    <div class="datetime-start datetime-sl">2021年8月</div>
+                    <div class="datetime-split">~</div>
+                    <div class="datetime-end datetime-sl">2021年11月</div>
+                </div>
+                <div class="datetime-month-year">
+                    <div class="dmy-pre"><</div>
+                    <div class="dmy-li">
+                        <div class="dmy-li-item">2012</div>
+                    </div>
+                    <div class="dmy-next">></div>
+                </div>
+                <div class="card-1-body">
+                    <div class="chart-wrapper">
+                        <div class="sel-wrapper">
+                            <div class="in-out-sel">
+                                <label class="sel-item sel-expenditure">
+                                    <span class="sel-radio"></span>
+                                    <span class="sel-text">支出</span>
+                                </label>
+                                <label class="sel-item sel-income">
+                                    <span class="sel-radio"></span>
+                                    <span class="sel-text">收入</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="chart-bar-wrapper"><div id="chart-bar"></div></div>
+                        <div class="chart-round-wrapper"><div id="chart-round"></div></div>
+                    </div>
+                    <div class="card-1-bill-list"></div>
+                    <div class="cb-detail">
+                        <div class="cb-detail-head">
+                            <div class="exit-cb-detail"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+                            <div class="cb-detail-title">详细账单</div>
+                        </div>
+                        <div class="cb-detail-body"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="app-card-statistic" class="app-card"></div>
+            <div id="app-card-me" class="app-card">
+                <div class="me-title">
+                    <span class="me-title-text">疯人账本</span>
+                </div>
+                <div class="me-head">
+                    <div class="me-logo"><i class="fab fa-pied-piper-alt"></i></div>
+                    <div class="me-slogan">开源 · 免费 · 无广告</div>
+                    <div class="me-info">已登录: </div>
+                </div>
+                <div class="me-body">
+                    <div class="me-item" data-bt="0">
+                        <span class="me-icon"><i class="fas fa-download"></i></span>
+                        <span class="me-text">导出全部账单</span>
+                    </div>
+                    <div class="me-item" data-bt="1">
+                        <span class="me-icon"><i class="fa fa-info-circle" aria-hidden="true"></i></span>
+                        <span class="me-text">关于</span>
+                    </div>
+                    <div class="me-item" data-bt="2">
+                        <span class="me-icon"><i class="fa fa-sign-out-alt" aria-hidden="true"></i></span>
+                        <span class="me-text">退出登录</span>
+                    </div>
+                </div>
+            </div>
+            <div id="app-footer">
+                <div class="footer-unit footer-selected" data-footer-index="0">
+                    <div class="footer-icon"><i class="fa fa-home fa-fw"></i></div>
+                    <div class="footer-prompt">首页</div>
+                </div>
+                <div class="footer-unit" data-footer-index="1">
+                    <div class="footer-icon"><i class="fa fa-list-alt fa-fw"></i></div>
+                    <div class="footer-prompt">账单</div>
+                </div>
+                <div class="footer-unit" data-footer-index="2">
+                    <div class="footer-icon"><i class="fa fa-chart-bar fa-fw"></i></div>
+                    <div class="footer-prompt">分析</div>
+                </div>
+                <div class="footer-unit" data-footer-index="3">
+                    <div class="footer-icon"><i class="fa fa-user fa-fw"></i></div>
+                    <div class="footer-prompt">我</div>
+                </div>
+            </div>
+        </div>
+        <div class="create-bill-page">
+            <div class="head-btn">
+                <div class="exit-create-bill"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+                <div class="delete-bill"><i class="far fa-trash-alt"></i></div>
+            </div>
+            <div class="expenditure-switch">
+                <div class="bill-type bill-type-selected" data-bill-type="expenditure">支出</div>
+                <div class="bill-type" data-bill-type="income">收入</div>
+            </div>
+            <div class="amount-group">
+                <div class="account-switch">
+                    <div class="account-item account-default">
+                        <div class="account-icon"><i class="fas fa-user-circle"></i></div>
+                        <div class="account-name"></div>
+                    </div>
+                </div>
+                <div class="amount-display">
+                    <span class="amount-display-sign">￥</span>
+                    <span class="amount-inner">
+                        <span class="amount-display-main">0.</span>
+                        <span class="amount-display-sub">00</span>
+                    </span>
+                    <span class="amount-display-pointer"></span>
+                </div>
+            </div>
+            <div class="category-group-wrapper">
+                <div class="book-group">
+                    <div class="book-item">
+                        <div class="book-name">
+                            <i class="fa fa-book" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-group"></div>
+                <div class="date-extra-group">
+                    <div class="date-text-wrapper">
+                        <div class="date-text">
+                            <span class="date-icon"><i class="fa fa-calendar-alt" aria-hidden="true"></i></span>
+                            <span class="date-prompt">今天</span>
+                        </div>
+                    </div>
+                    <div class="extra-text">
+                        <label class="extra-input-wrapper">
+                            <i class="fa fa-receipt" aria-hidden="true"></i>
+                            <input class="extra-input" type="text" maxlength="140" name="bill-extra" placeholder="输入备注信息" autocomplete="off">
+                        </label>
+                    </div>
+                </div>
+                <div class="create-bill-submit"><div class="bill-submit-btn">创建账单</div></div>
+            </div>
+            <div class="create-bill-keyboard">
+                <div class="create-bill-keys">
+                    <div class="key-item" data-k="1">1</div>
+                    <div class="key-item" data-k="2">2</div>
+                    <div class="key-item" data-k="3">3</div>
+                    <div class="key-item key-item-right" data-k="backspace"><i class="fa fa-backspace" aria-hidden="true"></i></div>
+                    <div class="key-item" data-k="4">4</div>
+                    <div class="key-item" data-k="5">5</div>
+                    <div class="key-item" data-k="6">6</div>
+                    <div class="key-item key-item-right" data-k="+">+</div>
+                    <div class="key-item" data-k="7">7</div>
+                    <div class="key-item" data-k="8">8</div>
+                    <div class="key-item" data-k="9">9</div>
+                    <div class="key-item key-item-right" data-k="-">-</div>
+                    <div class="key-item" data-k="0">0</div>
+                    <div class="key-item " data-k=".">.</div>
+                    <div class="key-item key-item-submit" data-k="enter">确定</div>
+                </div>
+            </div>
+        </div>
+        <div class="category-manage">
+            <div class="cat-head-btn">
+                <div class="exit-category-manage"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+                <div class="save-btn">保存</div>
+                <div class="cat-ex-switch">
+                    <div class="ex-type ex-type-selected" data-ex="0">支出</div>
+                    <div class="ex-type" data-ex="1">收入</div>
+                </div>
+            </div>
+            <div class="cat-manage-list"></div>
+            <div class="cat-add">
+                <div class="cat-add-btn">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>添加大类
+                </div>
+            </div>
+        </div>
+        <div class="category-edit">
+            <div class="cat-edit-head">
+                <div class="exit-cat-edit"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+                <div class="cat-edit-title">编辑分类</div>
+            </div>
+            <div class="cat-edit-body">
+                <div class="cat-edit-input-name">
+                    <label>
+                    <span class="cat-edit-input-label">输入大类名称: </span>
+                    <input type="text" class="cat-edit-input input-custom" name="cat-name" placeholder="4个汉字或12个字母以内">
+                    </label>
+                </div>
+                <div class="cat-edit-icon-group"></div>
+                <div class="cat-edit-save">保存</div>
+            </div>
+        </div>
+        <div class="calendar-page">
+            <div class="calendar-mask"></div>
+            <div class="calendar-rect animated"></div>
+        </div>
+    </div>
+</div>
+<div class="flow-list modal animated fadeInUp">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="flow-list-title">提示</h4>
+            </div>
+            <div class="modal-body flow-list-body">
+                <div class="flow-list-item">
+                    <span class="fl-icon"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                    <span class="fl-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="cl-prompt animated fadeInDown">
+    <div class="cl-prompt-header"><h4 id="cl-prompt-title"></h4></div>
+    <div class="cl-prompt-body"><p id="cl-prompt-content"></p></div>
+</div>
+<div id="cl-confirm" class="modal animated fadeInDown" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="cl-confirm-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <p id="cl-confirm-body">确定要继续吗？</p>
+                <button class="button center" id="cl-confirm-ccl-btn">不要</button>
+                <button class="button center" id="cl-confirm-cnf-btn">好的</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/madbook/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/madbook/static/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="/madbook/static/js/echarts.min.js"></script>
+<script type="text/javascript" src="/madbook/static/calendar/calendar.js"></script>
+<script type="text/javascript" src="/madbook/static/drawcharts.js"></script>
+<script type="text/javascript" src="/madbook/static/madbook.js"></script>
+<script>$($.cl.initPage)</script>
+</body>
+</html>
