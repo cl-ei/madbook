@@ -231,7 +231,7 @@ $.cl = {
         21: "cart-arrow-down",
         22: "mug-hot",
         23: "mobile-alt",
-        24: "toolbox",
+        24: "dumbbell",
         1000: "money-bill-alt",
         1001: "award",
         1002: "user-minus",

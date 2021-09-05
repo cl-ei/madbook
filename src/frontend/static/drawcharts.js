@@ -119,7 +119,7 @@ $.chart = {
                 bottom: "5%",
                 avoidLabelOverlap: false,
                 startAngle: 300,
-                minShowLabelAngle: data.length > 9 ? 10 : 0,
+                minShowLabelAngle: data.length > 7 ? 10 : 0,
                 label: {
                     alignTo: 'edge',
                     formatter: '{name|{b} {c}%}\n',  // {time|￥{c}}
