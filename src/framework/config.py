@@ -5,6 +5,7 @@ import sys
 MAD_BOOK_MONGODB_URL = os.environ.get("MAD_BOOK_MONGODB_URL")
 PASSWORD_ENCRYPT_SALT = os.environ.get("PASSWORD_ENCRYPT_SALT", "").encode("utf-8")
 TOKEN_ENCRYPT_SALT = os.environ.get("TOKEN_ENCRYPT_SALT", "").encode("utf-8")
+REG_KEY = os.environ.get("REG_KEY", "test_1234")
 
 if not all((MAD_BOOK_MONGODB_URL, PASSWORD_ENCRYPT_SALT, TOKEN_ENCRYPT_SALT)):
     print("Please set MAD_BOOK_MONGODB_URL/PASSWORD_ENCRYPT_SALT/TOKEN_ENCRYPT_SALT!")

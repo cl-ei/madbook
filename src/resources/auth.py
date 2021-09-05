@@ -11,6 +11,7 @@ from src.framework.config import (
     TOKEN_KEY,
     TOKEN_ALGORITHM,
     TOKEN_EXPIRE,
+    REG_KEY,
 )
 from src.framework.log4 import logger
 from src.framework.encryption import Encryptor
@@ -83,7 +84,7 @@ async def __make_auth_response(user: UserDoc) -> Response:
 
 async def reg(username: str, password: str, reg_key: str) -> Response:
     # TODO: change reg_key
-    if reg_key != "test_123":
+    if reg_key != REG_KEY:
         raise APIError("邀请码错误")
 
     encrypt_password = Encryptor().encode(password)
