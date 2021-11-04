@@ -1050,7 +1050,7 @@ $.cl = {
             if (rangeType === 0) {
                 let y = start.getFullYear(),
                     m = start.getMonth() + 1;
-                let em = (m + 1) % 12,
+                let em = m === 12 ? 1 : (m + 1),
                     ey = m === 12 ? y + 1 : y;
                 start_time = "" + y + "-" + (m < 10 ? "0" + m : m) + "-01 00:00:00";
                 end_time = "" + ey + "-" + (em < 10 ? "0" + em : em) + "-01 00:00:00";
