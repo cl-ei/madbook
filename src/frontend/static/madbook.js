@@ -506,18 +506,20 @@ $.cl = {
         //      此时已通过网络请求获取到user的账本信息，读取本地存储，将选中的账本渲染；当选择新账本时，也同步写入本地存储；
         // 2. 设定被点击时，拉起账本选择器，设定回调为"重渲染整个子页"
 
-        let selectedBookId = $.cl.localStorageGet("defaultBookId");
-        let displayName = "全部账本";
-        if (selectedBookId !== undefined && selectedBookId >= 0 && selectedBookId < $.cl.userBooks.length){
-            for (let i = 0; i < $.cl.userBooks.length; i++){
-                if ($.cl.userBooks[i].id === selectedBookId) {
-                    displayName = $.cl.userBooks[i].name;
+        function writeBookName(){
+            let selectedBookId = $.cl.localStorageGet("defaultBookId");
+            let displayName = "全部账本";
+            if (selectedBookId !== undefined && selectedBookId >= 0 && selectedBookId < $.cl.userBooks.length){
+                for (let i = 0; i < $.cl.userBooks.length; i++){
+                    if ($.cl.userBooks[i].id === selectedBookId) {
+                        displayName = $.cl.userBooks[i].name;
+                    }
                 }
+            } else {
+                $.cl.localStorageSet("defaultBookId", undefined);
             }
-        } else {
-            $.cl.localStorageSet("defaultBookId", undefined);
+            $(".book-sel-name").html(displayName);
         }
-        $(".book-sel-name").html(displayName);
 
         function onNewBookSelected(selected) {
             // 当默认账本被选中时，调用此回调。
@@ -525,17 +527,21 @@ $.cl = {
             let bookId = (selected.id !== null && selected.id !== undefined && selected.id >= 0) ? selected.id : -1;
             $.cl.localStorageSet("defaultBookId", bookId);
             reRenderCb();
+            writeBookName();
         }
+
+        writeBookName();
         $(".book-sel, .book-item").off("click").click(function () {$.cl.selBook(onNewBookSelected, true)});
     },
-    renderCreatBillPage: function (data) {
+    renderCreatBillPage: function (data, reRenderCB) {
         data = data || {};
+        reRenderCB = reRenderCB || function () {};
         let billId = data.id,
             isExpenditure = data.is_expenditure === undefined ? true : data.is_expenditure,
             account = data.account || 0,
             book = data.book || 0,
             amount = data.amount || "0",  // string type
-            category = data.category || 0,  // TODO: error
+            category = data.category || 0,
             date = data.date || new Date(),
             extra = data.extra || "";
 
@@ -618,6 +624,8 @@ $.cl = {
                 } else {
                     $.cl.popupMessage("账单" + action + "失败！");
                 }
+                // 编辑后调用回调函数，重渲染列表
+                reRenderCB();
             }
             $.cl.hideKeyBoard(); $.cl.submitBill(billId, _callback);
         });
@@ -626,7 +634,13 @@ $.cl = {
                 "/madbook/api/bill/" + billId,
                 "delete",
                 undefined,
-                function () {$.cl.popupMessage("删除成功！"); $.cl.triggerFooterBtn()}
+                function () {
+                    // 编辑后调用回调函数，重渲染列表
+                    reRenderCB();
+
+                    $.cl.popupMessage("删除成功！");
+                    $.cl.triggerFooterBtn();
+                }
             );
         }
         if (billId !== undefined){
@@ -840,7 +854,8 @@ $.cl = {
         _renderCatsList();
         pageDom.show();
     },
-    renderBillList: function (option) {
+    renderBillList: function (option, reRenderCB) {
+        reRenderCB = reRenderCB || function () {};
         option = option || {};
         let DOM = option.DOM,
             bills = option.bills,
@@ -935,7 +950,10 @@ $.cl = {
                     $(this).off("click").find(".hb-load-more").html('<i class="fas fa-spinner fa-spin"></i> 加载中');
                     _loadMoreCallBack();
                 } else {
-                    cb(billDataMap[billId]);
+                    // 处理删除条目后，重渲染列表的逻辑
+                    // 在本页，点击该条目后，进入到编辑页。编辑页可能会触发删除、编辑，改动之后需要刷新本页。
+                    // reRenderCB是渲染列表的函数，通过cb传入编辑页函数中，当编辑页函数触发更新后，调用 reRenderCB 完成重渲染。
+                    cb(billDataMap[billId], reRenderCB);
                 }
             });
         }
@@ -1410,7 +1428,7 @@ $.cl = {
                     bills: response.data.list,
                     cb: $.cl.renderCreatBillPage,
                     loadMore: {pagination: response.data.pagination, url: url}
-                })
+                }, function () {_renderDetailList(option)})
                 pageDom.show();
             }
             $.cl.sendRequest(url, "get", undefined, renderStatisticDetailList);
@@ -1443,7 +1461,7 @@ $.cl = {
                 })
             }
             function onCatListSel (item) {
-                console.log("selected: ", item);
+                console.log("onCatListSel selected: ", item);
                 _renderDetailList({
                     start: start,
                     end: end,
