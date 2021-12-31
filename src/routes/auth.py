@@ -27,11 +27,11 @@ async def login(
     dependencies=[Depends(auth.login_required)],
 )
 async def change_password(
-        username: str = Body(..., embed=True),
+        request: Request,
         password: str = Body(..., embed=True),
         old_password: str = Body(..., embed=True),
 ) -> Response:
-    return await auth.change_password(username, password, old_password)
+    return await auth.change_password(request.state.user.username, password, old_password)
 
 
 @router.post(

@@ -18,7 +18,7 @@ async def get_user(username: str, encrypt_password: str) -> UserDoc:
         query={"username": username, "password": encrypt_password},
     )
     if not user:
-        raise APIError(f"用户不存在")
+        raise APIError(f"用户名或密码错误")
     return user
 
 

@@ -1211,3 +1211,17 @@ input:-webkit-autofill {
 .cb-detail{
     display: none;
 }
+.edit-pass{
+    display: block;
+    margin: auto;
+    width: calc(70% - 52px);
+}
+.edit-pass-input{
+    border: none;
+    background: #fff;
+}
+.edit-pass-label-text{
+    display: inline-block;
+    width: 4em;
+    text-align: center;
+}

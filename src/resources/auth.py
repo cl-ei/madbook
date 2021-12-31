@@ -107,7 +107,7 @@ async def logout(user: UserDoc) -> Response:
     return resp
 
 
-async def change_password(username: str, new_password: str, old_password: str) -> Response:
+async def change_password(username, new_password: str, old_password: str) -> Response:
     e = Encryptor()
     user: UserDoc = await set_user_password(username, e.encode(old_password), e.encode(new_password))
     # TODO: need re-login

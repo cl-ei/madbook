@@ -1498,13 +1498,58 @@ $.cl = {
     renderCardMe: function () {
         $(".me-item").off("click").click(function () {
             let btn = parseInt($(this).data("bt"));
+            function doLogOut() {$.cl.sendRequest("/madbook/api/auth/logout", "post", undefined, $.cl.renderLoginPage)}
             if (btn === 0) {
-                window.location.href = "/madbook/api/bill/export";
+                let dom = '<div class="edit-pass">' +
+                    '<label class="extra-input-wrapper"><span class="edit-pass-label-text">旧密码</span>' +
+                    '<input class="edit-pass-input" type="password" maxlength="140" name="old-pass" placeholder="" autocomplete="off">' +
+                    '</label>' +
+                    '<label class="extra-input-wrapper"><span class="edit-pass-label-text">新密码</span>' +
+                    '<input class="edit-pass-input" type="password" maxlength="140" name="new-pass" placeholder="" autocomplete="off">' +
+                    '</label>' +
+                    '<label class="extra-input-wrapper"><span class="edit-pass-label-text">确认</span>' +
+                    '<input class="edit-pass-input" type="password" maxlength="140" name="new-pass-confirm" placeholder="" autocomplete="off">' +
+                    '</label>' +
+                    '</div>';
+                function sendChangePassReq() {
+                    let oldPass = $("input[name=old-pass]").val(),
+                        newPass = $("input[name=new-pass]").val(),
+                        newPassC = $("input[name=new-pass-confirm]").val();
+                    console.log("oldPass: ", oldPass)
+                    if (oldPass.length < 5) {
+                        $.cl.popupConfirm("旧密码过短", undefined, undefined, "提示");
+                        return;
+                    }
+                    if (!(newPass === newPassC)) {
+                        $.cl.popupConfirm("两次输入的密码不相同", undefined, undefined, "提示");
+                        return;
+                    }
+                    if (newPass === oldPass) {
+                        $.cl.popupConfirm("新旧密码不可相同", undefined, undefined, "提示");
+                        return;
+                    }
+                    $.cl.sendRequest(
+                        "/madbook/api/auth/change_password",
+                        "post",
+                        {"password": newPass, "old_password": oldPass},
+                        function (data) {
+                            if (data.err_code === 0) {
+                                $.cl.popupMessage("密码修改成功，请重新登录！");
+                                doLogOut();
+                            } else {
+                                $.cl.popupMessage(data.msg)
+                            }
+                        }
+                    );
+                }
+                $.cl.popupConfirm(dom, sendChangePassReq, undefined, "修改密码");
             } else if (btn === 1) {
-                $.cl.popupConfirm("疯人账本免费版(build_20210901pa1)<br>版权所有，请勿商业使用", undefined, undefined, "关于");
+                window.location.href = "/madbook/api/bill/export";
             } else if (btn === 2) {
+                $.cl.popupConfirm("疯人账本免费版(build_20210901pa1)<br>版权所有，请勿商业使用", undefined, undefined, "关于");
+            } else if (btn === 3) {
                 $.cl.popupConfirm("确定要退出吗？", function () {
-                    $.cl.sendRequest("/madbook/api/auth/logout", "post", undefined, $.cl.renderLoginPage);
+                    doLogOut();
                 });
             }
         });
