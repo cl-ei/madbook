@@ -73,7 +73,7 @@ class BillResource:
             },
             "list": bills,
             "user": self.user.dict(),
-            "books": [all_books[book_id] for book_id in books or []],
+            "books": [all_books.get(book_id) for book_id in books or []],
         }
         return result
 
@@ -100,7 +100,7 @@ class BillResource:
                 "end_time": convert_datetime_to_dt_str(end_time),
                 "books": books,
             },
-            "books": [all_books[book_id] for book_id in books or []],
+            "books": [all_books.get(book_id) for book_id in books or []],
         }
         return result
 

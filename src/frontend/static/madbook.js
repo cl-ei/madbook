@@ -509,7 +509,11 @@ $.cl = {
         let selectedBookId = $.cl.localStorageGet("defaultBookId");
         let displayName = "全部账本";
         if (selectedBookId !== undefined && selectedBookId >= 0 && selectedBookId < $.cl.userBooks.length){
-            displayName = $.cl.userBooks[selectedBookId].name;
+            for (let i = 0; i < $.cl.userBooks.length; i++){
+                if ($.cl.userBooks[i].id === selectedBookId) {
+                    displayName = $.cl.userBooks[i].name;
+                }
+            }
         } else {
             $.cl.localStorageSet("defaultBookId", undefined);
         }
@@ -1668,6 +1672,7 @@ $.cl = {
     },
     selBook: function (callback, incDefault) {
         // 账本选择器组件
+        // 会调用callback, 当选中时 id >= 0, -1为新建，-2为全部。
         function _createOrRenameBook(b) {
             b = b || {};
             console.log("_createOrRenameBook: ", b);
@@ -1714,6 +1719,11 @@ $.cl = {
                 $.cl.selBook(callback, incDefault);
                 let act = response.data.is_deleted === true ? "删除" : "置底";
                 $.cl.popupMessage("账本\"" + b.name + "\"已" + act);
+
+                if (response.data.is_deleted === true) {
+                    // 这一步是防止，页面中选中的账本被删除，导致显示空列表。当账本真删时，调用回调函数，选中全部账本，即-2
+                    callback({id: -2});
+                }
             });
         }
 
