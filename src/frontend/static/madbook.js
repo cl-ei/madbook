@@ -501,46 +501,28 @@ $.cl = {
             $(this).addClass("cat-item-selected");
         });
     },
-    reRenderBookList: function () {
-        // create bill card
-        let bnDom = $(".book-name");
-        let bookId = parseInt(bnDom.data("bid")) || 0;
-        let bk = $.cl.userBooks[0];
-        for (let i = 0; i < $.cl.userBooks.length; i++) {
-            let thisBk = $.cl.userBooks[i];
-            if (thisBk.id === bookId) {
-                bk = thisBk;
-                break;
-            }
-        }
-        function _onBookSelected(b) {
-            bnDom.data("bid", b.id).html('<i class="fa fa-book" aria-hidden="true"></i> ' + b.name);
-        }
-        _onBookSelected(bk);
-        $(".book-item").off("click").click(function (){$.cl.hideKeyBoard(); $.cl.selBook(_onBookSelected)});
+    renderBookSelBtnForSubPage: function(reRenderCb) {
+        // 1. 子页面初始化时，调用此函数。包括主页，账单页，统计页。
+        //      此时已通过网络请求获取到user的账本信息，读取本地存储，将选中的账本渲染；当选择新账本时，也同步写入本地存储；
+        // 2. 设定被点击时，拉起账本选择器，设定回调为"重渲染整个子页"
 
-        // home page
-        bookId = $.cl.localStorageGet("defaultBookId");
+        let selectedBookId = $.cl.localStorageGet("defaultBookId");
         let displayName = "全部账本";
-        if (bookId !== undefined && bookId >= 0){
-            bk = $.cl.userBooks[0];
-            for (let i = 0; i < $.cl.userBooks.length; i++) {
-                let thisBk = $.cl.userBooks[i];
-                if (thisBk.id === bookId) {
-                    bk = thisBk;
-                    break;
-                }
-            }
-            displayName = bk.name;
+        if (selectedBookId !== undefined && selectedBookId >= 0 && selectedBookId < $.cl.userBooks.length){
+            displayName = $.cl.userBooks[selectedBookId].name;
+        } else {
+            $.cl.localStorageSet("defaultBookId", undefined);
         }
         $(".book-sel-name").html(displayName);
 
-        function _selHomeBook (b) {
-            let bookId = (b.id !== null && b.id !== undefined && b.id >= 0) ? b.id : -1;
+        function onNewBookSelected(selected) {
+            // 当默认账本被选中时，调用此回调。
+            // 包含"全部"账本时，b.id 为 -2。
+            let bookId = (selected.id !== null && selected.id !== undefined && selected.id >= 0) ? selected.id : -1;
             $.cl.localStorageSet("defaultBookId", bookId);
-            $.cl.renderCardHome();
+            reRenderCb();
         }
-        $(".book-sel").off("click").click(function () {$.cl.selBook(_selHomeBook, true)});
+        $(".book-sel, .book-item").off("click").click(function () {$.cl.selBook(onNewBookSelected, true)});
     },
     renderCreatBillPage: function (data) {
         data = data || {};
@@ -555,9 +537,24 @@ $.cl = {
 
         $(".category-group").data("category", category);
 
-        // render book list
-        $(".book-name").data("bid", book);
-        $.cl.reRenderBookList();
+        // === 渲染创建账单页的账本选择器 ===
+        // 1. 先查找出选中的账本，若无则使用默认的。下述是用于编辑已存在的账单的场景。
+        let bookNameDOM = $(".book-name");
+        let selected = $.cl.userBooks[0];
+        for (let i = 0; i < $.cl.userBooks.length; i++) {
+            let thisBk = $.cl.userBooks[i];
+            if (thisBk.id === book) {
+                selected = thisBk;
+                break;
+            }
+        }
+        // 2. 渲染，并设置回调
+        function renderBookNameAfterSelected(bookObj) {
+            bookNameDOM.data("bid", bookObj.id).html('<i class="fa fa-book" aria-hidden="true"></i> ' + bookObj.name);
+        }
+        renderBookNameAfterSelected(selected);
+        $(".book-item").off("click").click(function (){$.cl.hideKeyBoard(); $.cl.selBook(renderBookNameAfterSelected)});
+        // === end ===
 
         // split cacheList, set status, set result, render
         let cacheList = amount === "0" ? "" : amount;
@@ -571,9 +568,6 @@ $.cl = {
             $(this).addClass("bill-type-selected");
             $.cl.renderCreatBillCategories();
         }).eq(isExpenditure ? 0 : 1).trigger("click");
-
-        // 渲染账本
-        $.cl.reRenderBookList();
 
         // 渲染账户
         let ac = {};
@@ -995,10 +989,10 @@ $.cl = {
                 let user = response.data.user;
                 // render user info
                 $(".me-info").html("已登录: " + user.username);
-                $.cl.userBooks = user.books;
-                $.cl.reRenderBookList();
-
                 $.cl.userAccounts = user.accounts;
+                $.cl.userBooks = user.books;
+                $.cl.renderBookSelBtnForSubPage($.cl.renderCardHome);
+                // renderBookSelBtnForHomePage();
 
                 if (parseInt($(".footer-selected").data("footer-index")) !== 0) return;
 
@@ -1305,11 +1299,18 @@ $.cl = {
         })
     },
     renderCardBill: function () {
+        // 先渲染账本
+        $.cl.renderBookSelBtnForSubPage($.cl.renderCardBill);
+
         function renderC2BillList(start, end, rangeType, params) {
             params = params || {}
             let url = "/madbook/api/bill?start_time=" + start + "&end_time=" + end;
             if (params.is_expenditure !== undefined) {
                 url += "&is_expenditure=" + (params.is_expenditure === true ? "1" : "0");
+            }
+            let selectedBookId = $.cl.localStorageGet("defaultBookId");
+            if (selectedBookId !== undefined && selectedBookId >= 0) {
+                url = url + "&books=" + selectedBookId;
             }
             $.cl.sendRequest(url, "get", undefined, function (response) {
                 console.log("renderC2BillList response: ", response);
@@ -1324,7 +1325,10 @@ $.cl = {
         function renderStatisticBar(start, end, rangeType) {
             console.log("send BillListReq: ", rangeType, start, end);
             let url = "/madbook/api/bill/statistic?start_time=" + start + "&end_time=" + end;
-
+            let selectedBookId = $.cl.localStorageGet("defaultBookId");
+            if (selectedBookId !== undefined && selectedBookId >= 0) {
+                url = url + "&books=" + selectedBookId;
+            }
             $.cl.sendRequest(url, "get", undefined, function (response) {
                 console.log("_renderStatisticBar response: ", response);
                 let data = response.data;
@@ -1364,6 +1368,9 @@ $.cl = {
         $("#app-footer, #app-card-bill").show();
     },
     renderCardStatistic: function () {
+        // 先渲染账本
+        $.cl.renderBookSelBtnForSubPage($.cl.renderCardStatistic);
+
         function _renderDetailList(option) {
             option = option || {};
             let start = option.start,
@@ -1377,6 +1384,10 @@ $.cl = {
             }
             if (categories.length > 0) {
                 url = url + "&categories=" + categories.join(",");
+            }
+            let selectedBookId = $.cl.localStorageGet("defaultBookId");
+            if (selectedBookId !== undefined && selectedBookId >= 0) {
+                url = url + "&books=" + selectedBookId;
             }
 
             function renderStatisticDetailList(response) {
@@ -1441,7 +1452,10 @@ $.cl = {
         }
         function _renderStatisticRound(start, end, rangeType) {
             let url = "/madbook/api/category/statistic?start_time=" + start + "&end_time=" + end;
-
+            let selectedBookId = $.cl.localStorageGet("defaultBookId");
+            if (selectedBookId !== undefined && selectedBookId >= 0) {
+                url = url + "&books=" + selectedBookId;
+            }
             $.cl.sendRequest(url, "get", undefined, function (response) {
                 console.log("_renderStatisticRound response: ", response);
                 let data = response.data;
@@ -1653,6 +1667,7 @@ $.cl = {
         $(".flow-list").modal("show");
     },
     selBook: function (callback, incDefault) {
+        // 账本选择器组件
         function _createOrRenameBook(b) {
             b = b || {};
             console.log("_createOrRenameBook: ", b);
@@ -1687,8 +1702,6 @@ $.cl = {
                 }
                 $.cl.sendRequest(url, type, {name: bookName}, function (response) {
                     $.cl.userBooks = response.data.books;
-                    $.cl.reRenderBookList();
-
                     $.cl.selBook(callback, incDefault);
                     $.cl.popupMessage("账本\"" + bookName + "\"成功" + action);
                 });
@@ -1698,8 +1711,6 @@ $.cl = {
         function _deleteBook(b) {
             $.cl.sendRequest("/madbook/api/book/" + b.id, "delete", undefined, function (response) {
                 $.cl.userBooks = response.data.books;
-                $.cl.reRenderBookList();
-
                 $.cl.selBook(callback, incDefault);
                 let act = response.data.is_deleted === true ? "删除" : "置底";
                 $.cl.popupMessage("账本\"" + b.name + "\"已" + act);
