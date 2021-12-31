@@ -1169,7 +1169,7 @@ input:-webkit-autofill {
     max-width: 600px;
     color: #4c4c4c;
     overflow-y: scroll;
-    height: calc(100% - 335px);
+    height: calc(100% - 435px);
 }
 .me-item{
     height: 60px;
