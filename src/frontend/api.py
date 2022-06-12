@@ -29,3 +29,8 @@ def render_to_response(tpl: str, context: Dict = None) -> Response:
 @router.get("")
 def home_page() -> Response:
     return render_to_response("src/frontend/tpl/home.html", {})
+
+
+@router.get("secret")
+def home_page() -> Response:
+    return render_to_response("src/frontend/tpl/secret.html", {})
