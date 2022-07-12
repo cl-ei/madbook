@@ -1,4 +1,5 @@
 DOCKER_NAME="madbook"
+DOCKER_IMAGE="madbook_img"
 
 existed=$(docker inspect --format '{{.State.Running}}' ${DOCKER_NAME} 2> /dev/null)
 if [ "${existed}" == "true" ]
