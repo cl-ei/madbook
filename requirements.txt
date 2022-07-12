@@ -9,3 +9,4 @@ Jinja2~=3.0.1
 crypto~=1.4.1
 PyJWT~=2.1.0
 pycrypto
+aiofiles
