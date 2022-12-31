@@ -1,1 +1,1 @@
-docker build -t madbook_img:latest .
+docker build -t calom1992/madbook_img:latest .
