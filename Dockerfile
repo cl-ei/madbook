@@ -8,7 +8,7 @@ RUN echo 'export LANG="C.UTF-8"' >> /etc/profile
 
 WORKDIR /app
 COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY . ./
 CMD ["uvicorn", "src.main:app", "--workers", "3", "--timeout-keep-alive", "600", "--port", "10093", "--host", "0.0.0.0"]
